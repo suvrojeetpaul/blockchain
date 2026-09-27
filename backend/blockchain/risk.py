@@ -200,18 +200,31 @@ def calculate_risk_score(
     # ============================================
     # RISK LEVEL
     # ============================================
+    # Requested bands:
+    # 0-30 -> LOW
+    # 30-60 -> MEDIUM
+    # 60+ -> HIGH
 
-    if score >= 70:
+    if score >= 60:
 
         risk_level = "HIGH"
 
-    elif score >= 40:
+    elif score >= 30:
 
         risk_level = "MEDIUM"
 
     else:
 
         risk_level = "LOW"
+
+    if not indicators:
+        risk_summary = "No material suspicious patterns were identified in the available transaction sample."
+    elif risk_level == "HIGH":
+        risk_summary = "Multiple suspicious behaviors were observed, including elevated network activity and fund dispersion patterns."
+    elif risk_level == "MEDIUM":
+        risk_summary = "The wallet shows moderate behavioral anomalies that may justify deeper review or follow-up examination."
+    else:
+        risk_summary = "Low signal activity detected in the current dataset; no strong suspicious patterns were identified."
 
     # ============================================
     # RETURN
@@ -222,6 +235,12 @@ def calculate_risk_score(
         "risk_score": score,
 
         "risk_level": risk_level,
+
+        "severity": risk_level,
+
+        "confidence": min(98, max(60, score + 10)),
+
+        "risk_summary": risk_summary,
 
         "indicators": indicators,
 
@@ -238,5 +257,15 @@ def calculate_risk_score(
             counterparty_count,
 
         "maximum_transaction_value":
-            max_value
+            max_value,
+
+        "normalized_score": round(score / 100, 3),
+
+        "wallet_activity_profile": {
+            "incoming_volume": incoming,
+            "outgoing_volume": outgoing,
+            "counterparty_diversity": counterparty_count,
+            "maximum_value": max_value,
+            "total_signals": len(indicators)
+        }
     }

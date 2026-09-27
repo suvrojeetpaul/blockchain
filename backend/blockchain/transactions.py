@@ -1,10 +1,11 @@
 import os
-import requests
+from pathlib import Path
 
+import requests
 from dotenv import load_dotenv
 
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 
 ALCHEMY_URL = os.getenv("ALCHEMY_URL")
