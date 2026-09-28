@@ -29,6 +29,7 @@ function App() {
   const [simpleMode, setSimpleMode] = useState(true);
   const [activeNav, setActiveNav] = useState("overview");
   const [recentSearches, setRecentSearches] = useState(defaultRecent);
+  const [showFullDetails, setShowFullDetails] = useState(false);
 
   useEffect(() => {
     const sections = navItems
@@ -107,6 +108,7 @@ function App() {
       }
 
       setResult(data.analysis);
+      setShowFullDetails(false);
       setActiveNav("overview");
       setRecentSearches((current) => {
         const nextEntry = {
@@ -139,6 +141,8 @@ function App() {
         walletInput={wallet}
         setWalletInput={setWallet}
         onAnalyze={analyzeWallet}
+        showFullDetails={showFullDetails}
+        setShowFullDetails={setShowFullDetails}
       />
     );
   }
@@ -157,20 +161,6 @@ function App() {
 function LandingScreen({ wallet, setWallet, onAnalyze, error, recentSearches }) {
   return (
     <div className="landing-page">
-      <video
-        className="landing-video"
-        autoPlay
-        loop
-        muted
-        playsInline
-        poster="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80"
-      >
-        <source
-          src="https://cdn.coverr.co/videos/coverr-abstract-background-1563301660596/1080p.mp4"
-          type="video/mp4"
-        />
-      </video>
-      <div className="landing-video-overlay" />
       <div className="landing-grid" />
 
       <header className="landing-header">
@@ -293,21 +283,6 @@ function AnalysisScreen({ wallet }) {
 
   return (
     <div className="analysis-page">
-      <video
-        className="analysis-video"
-        autoPlay
-        loop
-        muted
-        playsInline
-        poster="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80"
-      >
-        <source
-          src="https://cdn.coverr.co/videos/coverr-abstract-background-1563301660596/1080p.mp4"
-          type="video/mp4"
-        />
-      </video>
-      <div className="analysis-overlay" />
-
       <div className="analysis-shell">
         <div className="analysis-header">
           <span className="eyebrow dark">INVESTIGATION</span>
@@ -338,12 +313,24 @@ function AnalysisScreen({ wallet }) {
   );
 }
 
-function InvestigationWorkspace({ result, simpleMode, setSimpleMode, activeNav, setActiveNav, walletInput, setWalletInput, onAnalyze }) {
+function InvestigationWorkspace({
+  result,
+  simpleMode,
+  setSimpleMode,
+  activeNav,
+  setActiveNav,
+  walletInput,
+  setWalletInput,
+  onAnalyze,
+  showFullDetails,
+  setShowFullDetails,
+}) {
   const risk = result.risk || {};
   const summary = result.summary || {};
   const patterns = result.patterns || {};
   const vaspExposure = result.vasp_exposure || [];
   const indicators = risk.indicators || [];
+  const extractedDetails = result.extracted_details || {};
 
   const score = Math.min(Number(risk.risk_score) || 73, 100);
   const destination = {
@@ -361,6 +348,11 @@ function InvestigationWorkspace({ result, simpleMode, setSimpleMode, activeNav, 
     `VASP exposure: ${(vaspExposure || []).length}`,
     `Anomaly patterns: ${(patterns.rapid_movements || []).length + (patterns.fan_patterns || []).length}`,
   ];
+
+  const simpleRiskExplanation = (
+    risk.risk_summary ||
+    `This wallet shows ${risk.risk_level || "medium"} suspicious behavior because it has multiple high-risk signal clusters, repeated transfer patterns, and visible exposure to external counterparties.`
+  );
 
   const reportSummary = {
     heading: "Crypto Wallet Report",
@@ -443,304 +435,184 @@ function InvestigationWorkspace({ result, simpleMode, setSimpleMode, activeNav, 
 
   return (
     <div className="investigation-page">
-      <video
-        className="investigation-video"
-        autoPlay
-        loop
-        muted
-        playsInline
-        poster="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80"
-      >
-        <source
-          src="https://cdn.coverr.co/videos/coverr-abstract-background-1563301660596/1080p.mp4"
-          type="video/mp4"
-        />
-      </video>
-      <div className="investigation-overlay" />
-
       <div className="investigation-app-shell">
-        <aside className="investigation-sidebar">
-          <div className="brand-lockup compact">
-            <img className="brand-logo compact-logo" src="/image-1790440240899.jpeg" alt="BLOCKSPHERE" />
-          </div>
-
-        <nav className="investigation-nav" aria-label="Investigation navigation">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`nav-link ${activeNav === item.id ? "active" : ""}`}
-              onClick={() => {
-                setActiveNav(item.id);
-                const target = document.getElementById(item.id);
-                if (target) {
-                  target.scrollIntoView({ behavior: "smooth", block: "start" });
-                }
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
-      </aside>
-
-      <div className="investigation-main">
-        <header className="investigation-topbar">
-          <div className="topbar-search">
-            <input
-              value={walletInput}
-              onChange={(event) => setWalletInput(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  onAnalyze();
-                }
-              }}
-              placeholder="Enter wallet address"
-              aria-label="Wallet address"
-            />
-            <button type="button" className="primary-button small" onClick={() => onAnalyze()}>
-              Analyze
-            </button>
-          </div>
-        </header>
-
-        <main className="investigation-layout">
-          <section id="overview" className="top-story-grid">
-            <div className="section-card hero-brief">
-              <div className="eyebrow dark">{brandName} / INVESTIGATION</div>
-              <div className="wallet-title-row">
-                <h2>{sourceWalletAddress}</h2>
-                <span className="status-pill">Ethereum</span>
-              </div>
-              <div className="final-wallet-box">
-                <span>Final Wallet Address</span>
-                <strong>{finalWalletAddress}</strong>
-              </div>
-              <p>
-                Hybrid intelligence review combining model confidence, rule triggers, and anomaly
-                signals for the selected wallet.
-              </p>
+        <div className="investigation-main compact-main">
+          <header className="investigation-topbar compact-topbar">
+            <div className="topbar-brand">
+              <span className="brand-mark small-mark">B</span>
+              <span>BLOCKSPHERE</span>
             </div>
 
-            <div className="section-card prediction-card">
-              <div className="eyebrow dark">PREDICTION</div>
-              <div className="prediction-score-wrap">
-                <div className="big-score">{score}</div>
-                <div>
-                  <strong>{risk.risk_level || "MEDIUM"}</strong>
-                  <p>Hybrid risk score</p>
-                </div>
-              </div>
-              <div className="mini-meter"><span style={{ width: `${score}%` }} /></div>
-              <small>Confidence: {Math.max(60, Math.min(96, score + 12))}%</small>
-            </div>
-          </section>
-
-          <section id="risk" className="stat-strip">
-            <div className="stat-box">
-              <span>Hybrid risk</span>
-              <strong>{score}/100</strong>
-            </div>
-            <div className="stat-box">
-              <span>ML score</span>
-              <strong>{Math.min(98, Math.max(55, score + 8))}%</strong>
-            </div>
-            <div className="stat-box">
-              <span>Anomaly</span>
-              <strong>{(patterns.rapid_movements || []).length + 1}</strong>
-            </div>
-            <div className="stat-box">
-              <span>Transactions</span>
-              <strong>{summary.transactions_analyzed || 0}</strong>
-            </div>
-          </section>
-
-          <section id="timeline" className="detailed-report">
-            <div className="section-card report-card">
-              <div className="section-header">
-                <div>
-                  <span className="eyebrow dark">CRYPTO WALLET REPORT</span>
-                  <h3>{reportSummary.heading}</h3>
-                </div>
-              </div>
-
-              <div className="report-grid">
-                <div className="report-item">
-                  <span>Wallet Address</span>
-                  <strong>{reportSummary.walletAddress}</strong>
-                </div>
-                <div className="report-item">
-                  <span>Final Wallet Address</span>
-                  <strong>{reportSummary.finalWalletAddress}</strong>
-                </div>
-                <div className="report-item">
-                  <span>Prediction</span>
-                  <strong>{reportSummary.prediction}</strong>
-                </div>
-                <div className="report-item">
-                  <span>Output</span>
-                  <strong>{reportSummary.output}</strong>
-                </div>
-                <div className="report-item">
-                  <span>Final Address</span>
-                  <strong>{reportSummary.finalAddress}</strong>
-                </div>
-                <div className="report-item wide">
-                  <span>Features Extracted</span>
-                  <strong>{reportSummary.featuresExtracted}</strong>
-                </div>
-                <div className="report-item wide">
-                  <span>Explanation</span>
-                  <strong>{reportSummary.explanation}</strong>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section id="network" className="main-investigation-grid">
-            <div className="section-card network-card">
-              <div className="section-header">
-                <div>
-                  <span className="eyebrow dark">NETWORK</span>
-                  <h3>Wallet relationship map</h3>
-                </div>
-              </div>
-              <TransactionGraph
-                transactions={result.transactions || []}
-                investigatedWallet={result.wallet}
-                rapidMovements={patterns.rapid_movements || []}
+            <div className="topbar-search compact-search">
+              <input
+                value={walletInput}
+                onChange={(event) => setWalletInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    onAnalyze();
+                  }
+                }}
+                placeholder="Enter wallet address"
+                aria-label="Wallet address"
               />
+              <button type="button" className="primary-button small" onClick={() => onAnalyze()}>
+                Reanalyze
+              </button>
+              <button
+                type="button"
+                className="secondary-button compact-ghost"
+                onClick={() => {
+                  setWalletInput("");
+                  setShowFullDetails(false);
+                }}
+              >
+                Analyze new wallet
+              </button>
             </div>
+          </header>
 
-            <div className="stacked-column">
-              <div className="section-card explanation-card">
-                <div className="section-header">
+          <main className="investigation-layout single-layout">
+            <section className="summary-overview" aria-label="Wallet summary">
+              <div className="section-card summary-card large-summary">
+                <div className="eyebrow dark">Wallet overview</div>
+                <div className="wallet-title-row compact-row">
+                  <h2>{sourceWalletAddress}</h2>
+                  <span className="status-pill">{risk.risk_level || "MEDIUM"}</span>
+                </div>
+                <div className="final-wallet-box">
+                  <span>Initial wallet</span>
+                  <strong>{sourceWalletAddress}</strong>
+                </div>
+                <div className="final-wallet-box alt-box">
+                  <span>Final wallet</span>
+                  <strong>{finalWalletAddress}</strong>
+                </div>
+              </div>
+
+              <div className="section-card score-card">
+                <div className="eyebrow dark">Risk score</div>
+                <div className="prediction-score-wrap single-score-wrap">
+                  <div className="big-score">{score}</div>
                   <div>
-                    <span className="eyebrow dark">WHY THIS RESULT?</span>
-                    <h3>Investigation summary</h3>
+                    <strong>{risk.risk_level || "MEDIUM"}</strong>
+                    <p>Hybrid intelligence</p>
                   </div>
                 </div>
-                <ul>
-                  {indicators.length > 0 ? (
-                    indicators.slice(0, 4).map((indicator) => <li key={indicator}>{indicator}</li>)
-                  ) : (
-                    <li>No unusually elevated signals were returned.</li>
-                  )}
-                </ul>
+                <div className="mini-meter"><span style={{ width: `${score}%` }} /></div>
+                <small>Confidence: {Math.max(60, Math.min(96, score + 12))}%</small>
               </div>
+            </section>
 
-              <div className="section-card destination-card">
-                <div className="section-header">
+            <section className="risk-detail-grid" aria-label="Risk details">
+              <div className="mini-risk-card">
+                <span>Risk level</span>
+                <strong>{risk.risk_level || "MEDIUM"}</strong>
+                <small>{score}/100</small>
+              </div>
+              <div className="mini-risk-card">
+                <span>Signal volume</span>
+                <strong>{Math.max(1, indicators.length || 3)}</strong>
+                <small>Indicators</small>
+              </div>
+              <div className="mini-risk-card">
+                <span>Exposure</span>
+                <strong>{vaspExposure.length || 0}</strong>
+                <small>VASP matches</small>
+              </div>
+            </section>
+
+            <section className="insight-grid" aria-label="Investigation details">
+              <div className="section-card network-panel">
+                <div className="section-header compact-header">
                   <div>
-                    <span className="eyebrow dark">FINAL DESTINATION</span>
-                    <h3>Likely flow</h3>
+                    <span className="eyebrow dark">Network</span>
+                    <h3>Wallet graph</h3>
                   </div>
                 </div>
-                <div className="destination-pill">{destination.primary}</div>
-                <div className="destination-list">
-                  {destination.secondary.map((item) => (
-                    <span key={item}>{item}</span>
-                  ))}
-                </div>
+                <TransactionGraph
+                  transactions={result.transactions || []}
+                  investigatedWallet={result.wallet}
+                  rapidMovements={patterns.rapid_movements || []}
+                />
               </div>
-            </div>
-          </section>
 
-          <section id="flows" className="detail-grid">
-            <div className="section-card">
-              <div className="section-header">
-                <div>
-                  <span className="eyebrow dark">RISK SIGNALS</span>
-                  <h3>Signal breakdown</h3>
-                </div>
-              </div>
-              <div className="signal-stack">
-                {[
-                  { label: "ML", value: Math.min(95, score + 7) },
-                  { label: "Rules", value: Math.min(90, score + 5) },
-                  { label: "Anomaly", value: Math.min(88, score + 2) },
-                ].map((signal) => (
-                  <div key={signal.label} className="signal-row">
-                    <div className="signal-copy">
-                      <span>{signal.label}</span>
-                      <strong>{signal.value}%</strong>
-                    </div>
-                    <div className="signal-bar">
-                      <span style={{ width: `${signal.value}%` }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="section-card">
-              <div className="section-header">
-                <div>
-                  <span className="eyebrow dark">EVIDENCE</span>
-                  <h3>Behavioral indicators</h3>
-                </div>
-              </div>
-              <div className="evidence-stack">
-                {(indicators.length ? indicators : ["No material alert signals detected"]).slice(0, 4).map((item) => (
-                  <div key={item} className="evidence-item">
-                    <span className="evidence-bullet" />
+              <div className="stacked-panel">
+                <div className="section-card explanation-panel">
+                  <div className="section-header compact-header">
                     <div>
-                      <strong>{item}</strong>
-                      <small>{getIndicatorExplanation(item)}</small>
+                      <span className="eyebrow dark">Simple explanation</span>
+                      <h3>Why this risk rating?</h3>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section id="entities" className="info-grid">
-            <div className="section-card">
-              <div className="section-header">
-                <div>
-                  <span className="eyebrow dark">NETWORK</span>
-                  <h3>Entity exposure</h3>
+                  <p>{simpleRiskExplanation}</p>
                 </div>
-              </div>
-              <div className="entity-list">
-                {(vaspExposure.length ? vaspExposure : [{ vasp: "No known exchange", confidence: "0%" }]).map((entity, index) => (
-                  <div key={`${entity.vasp}-${index}`} className="entity-row">
-                    <strong>{entity.vasp}</strong>
-                    <span>{entity.distance ? `${entity.distance} transfers away` : "No direct link"}</span>
-                    <small>{entity.confidence ? `Confidence: ${entity.confidence}` : "Awaiting review"}</small>
+
+                <div className="section-card destination-panel">
+                  <div className="section-header compact-header">
+                    <div>
+                      <span className="eyebrow dark">Likely flow</span>
+                      <h3>Final destination</h3>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="section-card">
-              <div className="section-header">
-                <div>
-                  <span className="eyebrow dark">REPORT</span>
-                  <h3>Investigation package</h3>
+                  <div className="destination-pill">{destination.primary}</div>
+                  <div className="destination-list compact-list">
+                    {destination.secondary.map((item) => (
+                      <span key={item}>{item}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div className="report-box">
-                <strong>Generate report</strong>
-                <p>Summarize risk, destinations, patterns, and evidence for review.</p>
-                <button type="button" className="secondary-button" onClick={handleExportReport}>
-                  Export report
-                </button>
-              </div>
-            </div>
-          </section>
+            </section>
 
-          <div className="mode-toggle-wrap">
-            <button type="button" className={simpleMode ? "active" : ""} onClick={() => setSimpleMode(true)}>
-              Simple
-            </button>
-            <button type="button" className={!simpleMode ? "active" : ""} onClick={() => setSimpleMode(false)}>
-              Technical
-            </button>
-          </div>
-        </main>
+            <section className="action-row">
+              <button type="button" className="secondary-button action-button" onClick={() => setShowFullDetails((current) => !current)}>
+                {showFullDetails ? "Hide complete details" : "View complete details"}
+              </button>
+              <button type="button" className="primary-button action-button" onClick={handleExportReport}>
+                Print final report
+              </button>
+            </section>
+
+            {showFullDetails && (
+              <section className="full-details-panel section-card" aria-label="Complete details">
+                <div className="section-header compact-header">
+                  <div>
+                    <span className="eyebrow dark">Complete details</span>
+                    <h3>Investigation record</h3>
+                  </div>
+                </div>
+
+                <div className="report-grid compact-grid">
+                  <div className="report-item">
+                    <span>Initial wallet</span>
+                    <strong>{sourceWalletAddress}</strong>
+                  </div>
+                  <div className="report-item">
+                    <span>Final wallet</span>
+                    <strong>{finalWalletAddress}</strong>
+                  </div>
+                  <div className="report-item">
+                    <span>Risk score</span>
+                    <strong>{score}/100</strong>
+                  </div>
+                  <div className="report-item">
+                    <span>Risk level</span>
+                    <strong>{risk.risk_level || "MEDIUM"}</strong>
+                  </div>
+                  <div className="report-item wide">
+                    <span>Key findings</span>
+                    <strong>{(extractedDetails.key_findings || featureList).slice(0, 4).join(" • ")}</strong>
+                  </div>
+                  <div className="report-item wide">
+                    <span>Simple explanation</span>
+                    <strong>{simpleRiskExplanation}</strong>
+                  </div>
+                </div>
+              </section>
+            )}
+          </main>
+        </div>
       </div>
-    </div>
     </div>
   );
 }

@@ -580,14 +580,9 @@ export default function TransactionGraph({
         flexDirection:
           "column",
 
-        gap: 10,
+        gap: 6,
       }}
     >
-
-
-      {/* =====================================================
-          FILTER BAR
-      ===================================================== */}
 
       <div
         style={{
@@ -607,7 +602,7 @@ export default function TransactionGraph({
           style={{
             color: "#718097",
 
-            fontSize: 10,
+            fontSize: 9,
 
             fontWeight: 700,
 
@@ -662,7 +657,7 @@ export default function TransactionGraph({
               style={{
 
                 padding:
-                  "8px 13px",
+                  "6px 10px",
 
                 borderRadius: 7,
 
@@ -687,7 +682,7 @@ export default function TransactionGraph({
 
                     : "#7f8da3",
 
-                fontSize: 11,
+                fontSize: 10,
 
                 fontWeight:
                   filter === value
@@ -721,7 +716,7 @@ export default function TransactionGraph({
             color:
               "#718097",
 
-            fontSize: 10,
+            fontSize: 9,
           }}
         >
 
@@ -766,11 +761,14 @@ export default function TransactionGraph({
         style={{
           width: "100%",
 
-          height: 600,
+          height: 440,
+
+          minHeight: 440,
 
           display: "flex",
 
-          gap: 14,
+          gap: 8,
+          alignItems: "stretch",
         }}
       >
 
@@ -797,6 +795,8 @@ export default function TransactionGraph({
 
             position:
               "relative",
+
+            aspectRatio: "1 / 1",
           }}
         >
 
@@ -908,6 +908,10 @@ export default function TransactionGraph({
               2
             }
 
+            style={{
+              height: "100%",
+              width: "100%",
+            }}
 
             onEdgeClick={
               (event, edge) => {
@@ -962,11 +966,11 @@ export default function TransactionGraph({
 
           <div
             style={{
-              width: 300,
+              width: 220,
 
               flexShrink: 0,
 
-              padding: 20,
+              padding: 12,
 
               borderRadius: 14,
 
