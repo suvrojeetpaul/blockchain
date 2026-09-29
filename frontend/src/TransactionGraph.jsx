@@ -35,7 +35,10 @@ function WalletNode({ data }) {
           ? "#142b49"
           : "#111c2d",
 
-        color: "#edf2f7",
+        // FORCE NODE TEXT TO WHITE
+        color: "#ffffff",
+
+        WebkitTextFillColor: "#ffffff",
 
         boxShadow: isSuspect
           ? "0 0 25px rgba(92,157,255,0.25)"
@@ -53,12 +56,22 @@ function WalletNode({ data }) {
         }}
       />
 
+
+      {/* NODE TYPE */}
+
       <div
         style={{
           fontSize: 10,
-          color: "#7f91aa",
+
+          color: "#ffffff",
+
+          WebkitTextFillColor: "#ffffff",
+
           marginBottom: 5,
+
           letterSpacing: 0.5,
+
+          fontWeight: 700,
         }}
       >
         {isSuspect
@@ -68,15 +81,27 @@ function WalletNode({ data }) {
           : "CONNECTED WALLET"}
       </div>
 
+
+      {/* WALLET ADDRESS */}
+
       <div
         style={{
           fontSize: 12,
+
           fontWeight: 700,
+
+          color: "#ffffff",
+
+          WebkitTextFillColor: "#ffffff",
+
           wordBreak: "break-all",
+
+          lineHeight: 1.4,
         }}
       >
         {data.address}
       </div>
+
 
       <Handle
         type="source"
@@ -584,6 +609,10 @@ export default function TransactionGraph({
       }}
     >
 
+      {/* =====================================================
+          FILTER BAR
+      ===================================================== */}
+
       <div
         style={{
           display: "flex",
@@ -600,7 +629,10 @@ export default function TransactionGraph({
 
         <div
           style={{
-            color: "#718097",
+            color: "#ffffff",
+
+            WebkitTextFillColor:
+              "#ffffff",
 
             fontSize: 9,
 
@@ -675,25 +707,32 @@ export default function TransactionGraph({
 
                     : "#0d1524",
 
-                color:
-                  filter === value
+                // FORCE FILTER TEXT TO WHITE
+                color: "#ffffff",
 
-                    ? "#dceaff"
-
-                    : "#7f8da3",
+                WebkitTextFillColor:
+                  "#ffffff",
 
                 fontSize: 10,
 
                 fontWeight:
                   filter === value
                     ? 700
-                    : 400,
+                    : 500,
 
                 cursor:
                   "pointer",
 
                 transition:
                   "all 0.15s ease",
+
+                fontFamily:
+                  "inherit",
+
+                textShadow:
+                  filter === value
+                    ? "0 0 8px rgba(255,255,255,0.15)"
+                    : "none",
 
               }}
             >
@@ -714,7 +753,10 @@ export default function TransactionGraph({
               "auto",
 
             color:
-              "#718097",
+              "#ffffff",
+
+            WebkitTextFillColor:
+              "#ffffff",
 
             fontSize: 9,
           }}
@@ -725,7 +767,10 @@ export default function TransactionGraph({
           <strong
             style={{
               color:
-                "#cbd7e8",
+                "#ffffff",
+
+              WebkitTextFillColor:
+                "#ffffff",
             }}
           >
             {
@@ -738,7 +783,10 @@ export default function TransactionGraph({
           <strong
             style={{
               color:
-                "#cbd7e8",
+                "#ffffff",
+
+              WebkitTextFillColor:
+                "#ffffff",
             }}
           >
             {
@@ -768,7 +816,9 @@ export default function TransactionGraph({
           display: "flex",
 
           gap: 8,
-          alignItems: "stretch",
+
+          alignItems:
+            "stretch",
         }}
       >
 
@@ -796,12 +846,15 @@ export default function TransactionGraph({
             position:
               "relative",
 
-            aspectRatio: "1 / 1",
+            aspectRatio:
+              "1 / 1",
           }}
         >
 
 
-          {/* LEGEND */}
+          {/* =================================================
+              LEGEND
+          ================================================= */}
 
           <div
             style={{
@@ -832,16 +885,35 @@ export default function TransactionGraph({
 
               fontSize: 9,
 
+              // FORCE LEGEND TEXT WHITE
               color:
-                "#8392a8",
+                "#ffffff",
+
+              WebkitTextFillColor:
+                "#ffffff",
             }}
           >
 
-            <span>
+            {/* INCOMING */}
+
+            <span
+              style={{
+                color:
+                  "#ffffff",
+
+                WebkitTextFillColor:
+                  "#ffffff",
+              }}
+            >
+
               <span
                 style={{
                   color:
                     "#69a7ff",
+
+                  WebkitTextFillColor:
+                    "#69a7ff",
+
                   marginRight: 4,
                 }}
               >
@@ -849,14 +921,30 @@ export default function TransactionGraph({
               </span>
 
               Incoming
+
             </span>
 
 
-            <span>
+            {/* OUTGOING */}
+
+            <span
+              style={{
+                color:
+                  "#ffffff",
+
+                WebkitTextFillColor:
+                  "#ffffff",
+              }}
+            >
+
               <span
                 style={{
                   color:
                     "#e67883",
+
+                  WebkitTextFillColor:
+                    "#e67883",
+
                   marginRight: 4,
                 }}
               >
@@ -864,14 +952,30 @@ export default function TransactionGraph({
               </span>
 
               Outgoing
+
             </span>
 
 
-            <span>
+            {/* RAPID */}
+
+            <span
+              style={{
+                color:
+                  "#ffffff",
+
+                WebkitTextFillColor:
+                  "#ffffff",
+              }}
+            >
+
               <span
                 style={{
                   color:
                     "#f3b75b",
+
+                  WebkitTextFillColor:
+                    "#f3b75b",
+
                   marginRight: 4,
                 }}
               >
@@ -879,10 +983,15 @@ export default function TransactionGraph({
               </span>
 
               Rapid
+
             </span>
 
           </div>
 
+
+          {/* =================================================
+              REACT FLOW
+          ================================================= */}
 
           <ReactFlow
 
@@ -909,8 +1018,11 @@ export default function TransactionGraph({
             }
 
             style={{
-              height: "100%",
-              width: "100%",
+              height:
+                "100%",
+
+              width:
+                "100%",
             }}
 
             onEdgeClick={
@@ -927,30 +1039,51 @@ export default function TransactionGraph({
 
             <Background
               gap={20}
+
               size={1}
+
               color="#1c2a3e"
             />
 
 
             <Controls
               style={{
-                background: "#0f172a",
-                border: "1px solid #334155",
-               borderRadius: "10px",
+                background:
+                  "#0f172a",
+
+                border:
+                  "1px solid #334155",
+
+                borderRadius:
+                  "10px",
               }}
             />
 
 
             <MiniMap
+
               nodeColor="#1e293b"
+                
+
               nodeStrokeColor="#60a5fa"
+               
+
               nodeBorderRadius={6}
+
               maskColor="rgba(2, 6, 23, 0.75)"
+                
+
               style={{
-                background: "#0f172a",
-                border: "1px solid #334155",
-                borderRadius: "10px",
-             }}
+                background:
+                  "#0f172a",
+
+                border:
+                  "1px solid #334155",
+
+                borderRadius:
+                  "10px",
+              }}
+
             />
 
           </ReactFlow>
@@ -981,7 +1114,10 @@ export default function TransactionGraph({
                 "#0d1524",
 
               color:
-                "#edf2f7",
+                "#ffffff",
+
+              WebkitTextFillColor:
+                "#ffffff",
 
               overflowY:
                 "auto",
@@ -1029,6 +1165,12 @@ export default function TransactionGraph({
                       "7px 0 0",
 
                     fontSize: 18,
+
+                    color:
+                      "#ffffff",
+
+                    WebkitTextFillColor:
+                      "#ffffff",
                   }}
                 >
                   Transfer details
@@ -1052,7 +1194,10 @@ export default function TransactionGraph({
                     "#172238",
 
                   color:
-                    "#8999b0",
+                    "#ffffff",
+
+                  WebkitTextFillColor:
+                    "#ffffff",
 
                   borderRadius:
                     6,
@@ -1307,7 +1452,10 @@ export default function TransactionGraph({
                   "#111d2d",
 
                 color:
-                  "#8796ac",
+                  "#ffffff",
+
+                WebkitTextFillColor:
+                  "#ffffff",
 
                 fontSize: 11,
 
@@ -1375,8 +1523,12 @@ function DetailRow({
 
       <div
         style={{
+          // FORCE DETAIL VALUE TEXT WHITE
           color:
-            "#d9e2ef",
+            "#ffffff",
+
+          WebkitTextFillColor:
+            "#ffffff",
 
           fontSize: 11,
 

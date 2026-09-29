@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
 :root {
   --page-bg: #f5f6f3;
@@ -29,8 +29,8 @@
   --gradient-main: linear-gradient(135deg, #090b0d 0%, #111827 18%, #1e232a 38%, #36404c 66%, #0a0c0f 100%);
   --gradient-soft: linear-gradient(135deg, rgba(17, 17, 17, 0.05), rgba(17, 17, 17, 0.02), rgba(76, 86, 100, 0.04));
   --gradient-panel: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,247,245,0.92));
-  --tech-font: 'Orbitron', 'Rajdhani', 'Segoe UI', sans-serif;
-  --body-font: 'Rajdhani', 'Segoe UI', sans-serif;
+  --tech-font: 'Manrope', 'Segoe UI', sans-serif;
+  --body-font: 'Manrope', 'Segoe UI', sans-serif;
 }
 
 * {
@@ -115,6 +115,10 @@ body, p, span, strong, small, em, li, td, th {
 .investigation-page * {
   color: var(--text-soft) !important;
   text-shadow: none !important;
+}
+
+.investigation-page .primary-button {
+  color: #fff !important;
 }
 
 .analysis-page .detail-label,
@@ -574,7 +578,7 @@ input {
 }
 
 .recent-item span {
-  font-family: "SFMono-Regular", Consolas, monospace;
+  font-family: var(--body-font);
   font-size: 0.8rem;
   color: rgba(236, 245, 255, 0.9);
 }
