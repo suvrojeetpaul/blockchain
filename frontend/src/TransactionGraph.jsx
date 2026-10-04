@@ -23,8 +23,8 @@ function WalletNode({ data }) {
   return (
     <div
       style={{
-        minWidth: 150,
-        padding: "14px 16px",
+        minWidth: 124,
+        padding: "10px 12px",
         borderRadius: 14,
 
         border: isSuspect
@@ -86,7 +86,7 @@ function WalletNode({ data }) {
 
       <div
         style={{
-          fontSize: 12,
+          fontSize: 11,
 
           fontWeight: 700,
 
@@ -443,17 +443,16 @@ function buildGraph(
   otherNodes.forEach(
     (node, index) => {
 
+      const nodesPerRing = 12;
+      const ringIndex = Math.floor(index / nodesPerRing);
+      const ringPosition = index % nodesPerRing;
+      const ringSize = Math.min(
+        nodesPerRing,
+        otherNodes.length - ringIndex * nodesPerRing
+      );
       const angle =
-        (index /
-          Math.max(
-            otherNodes.length,
-            1
-          )) *
-        Math.PI *
-        2;
-
-
-      const radius = 280;
+        (ringPosition / Math.max(ringSize, 1)) * Math.PI * 2;
+      const radius = 260 + ringIndex * 135;
 
 
       node.position = {
@@ -820,6 +819,7 @@ export default function TransactionGraph({
           alignItems:
             "stretch",
         }}
+        className="transaction-graph-layout"
       >
 
 
@@ -849,6 +849,7 @@ export default function TransactionGraph({
             aspectRatio:
               "1 / 1",
           }}
+          className="transaction-graph-canvas"
         >
 
 
@@ -1122,6 +1123,7 @@ export default function TransactionGraph({
               overflowY:
                 "auto",
             }}
+            className="transaction-details"
           >
 
 

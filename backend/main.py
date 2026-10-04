@@ -5,6 +5,7 @@ from models import WalletAnalysisRequest
 from investigation.service import (
     analyze_wallet
 )
+from rule_application import router as rule_application_router
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -24,6 +25,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(rule_application_router)
 
 @app.get("/")
 def home():

@@ -126,6 +126,15 @@ function App() {
     }
   }
 
+  function startNewAnalysis() {
+    setWallet("");
+    setResult(null);
+    setError("");
+    setRecentSearches([]);
+    setShowFullDetails(false);
+    setActiveNav("overview");
+  }
+
   if (loading) {
     return <AnalysisScreen wallet={wallet} />;
   }
@@ -141,6 +150,7 @@ function App() {
         walletInput={wallet}
         setWalletInput={setWallet}
         onAnalyze={analyzeWallet}
+        onStartNewAnalysis={startNewAnalysis}
         showFullDetails={showFullDetails}
         setShowFullDetails={setShowFullDetails}
       />
@@ -322,6 +332,7 @@ function InvestigationWorkspace({
   walletInput,
   setWalletInput,
   onAnalyze,
+  onStartNewAnalysis,
   showFullDetails,
   setShowFullDetails,
 }) {
@@ -461,10 +472,7 @@ function InvestigationWorkspace({
               <button
                 type="button"
                 className="secondary-button compact-ghost"
-                onClick={() => {
-                  setWalletInput("");
-                  setShowFullDetails(false);
-                }}
+                onClick={onStartNewAnalysis}
               >
                 Analyze new wallet
               </button>
