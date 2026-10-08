@@ -13,14 +13,6 @@ const navItems = [
   { id: "evidence", label: "Evidence" },
 ];
 
-const brandName = "BLOCKSPHERE";
-
-const defaultRecent = [
-  { wallet: "0x742d35Cc...", risk: "HIGH", time: "2m ago" },
-  { wallet: "0x8215F5A1...", risk: "MEDIUM", time: "1h ago" },
-  { wallet: "0x9319b3D8...", risk: "LOW", time: "3h ago" },
-];
-
 function App() {
   const [wallet, setWallet] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,7 +20,6 @@ function App() {
   const [error, setError] = useState("");
   const [simpleMode, setSimpleMode] = useState(true);
   const [activeNav, setActiveNav] = useState("overview");
-  const [recentSearches, setRecentSearches] = useState(defaultRecent);
   const [showFullDetails, setShowFullDetails] = useState(false);
 
   useEffect(() => {
@@ -110,15 +101,6 @@ function App() {
       setResult(data.analysis);
       setShowFullDetails(false);
       setActiveNav("overview");
-      setRecentSearches((current) => {
-        const nextEntry = {
-          wallet: formatShortWallet(value),
-          risk: data.analysis.risk.risk_level,
-          time: "just now",
-        };
-
-        return [nextEntry, ...current.filter((entry) => entry.wallet !== nextEntry.wallet)].slice(0, 4);
-      });
     } catch (err) {
       setError(err.message || "Unable to analyze the wallet.");
     } finally {
@@ -130,7 +112,6 @@ function App() {
     setWallet("");
     setResult(null);
     setError("");
-    setRecentSearches([]);
     setShowFullDetails(false);
     setActiveNav("overview");
   }
@@ -163,12 +144,11 @@ function App() {
       setWallet={setWallet}
       onAnalyze={analyzeWallet}
       error={error}
-      recentSearches={recentSearches}
     />
   );
 }
 
-function LandingScreen({ wallet, setWallet, onAnalyze, error, recentSearches }) {
+function LandingScreen({ wallet, setWallet, onAnalyze, error }) {
   return (
     <div className="landing-page">
       <div className="landing-grid" />
@@ -262,19 +242,6 @@ function LandingScreen({ wallet, setWallet, onAnalyze, error, recentSearches }) 
 
         {error && <div className="inline-error">{error}</div>}
 
-        <div className="recent-strip">
-          {recentSearches.map((entry) => (
-            <button
-              key={`${entry.wallet}-${entry.time}`}
-              type="button"
-              className="recent-item"
-              onClick={() => setWallet(entry.wallet.replace("...", ""))}
-            >
-              <span>{entry.wallet}</span>
-              <em className={`mini-risk mini-risk-${entry.risk.toLowerCase()}`}>{entry.risk}</em>
-            </button>
-          ))}
-        </div>
       </main>
     </div>
   );
