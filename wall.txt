@@ -1,0 +1,3 @@
+cd C:\Users\pauls\OneDrive\Desktop\sih\blockchain\backend
+
+.\.venv\Scripts\python.exe -c "import sqlite3; c=sqlite3.connect('data/wallet_searches.db'); print('WALLET RECORDS'); print(*c.execute('SELECT wallet_address, search_count, risk_score, risk_level, last_searched_at FROM wallet_records').fetchall(), sep='\n'); print('SEARCH HISTORY'); print(*c.execute('SELECT id, wallet_address, searched_at, cache_hit FROM wallet_searches ORDER BY id DESC').fetchall(), sep='\n'); c.close()"

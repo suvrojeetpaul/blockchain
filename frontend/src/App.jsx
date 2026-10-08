@@ -155,8 +155,11 @@ function LandingScreen({ wallet, setWallet, onAnalyze, error }) {
 
       <header className="landing-header">
         <div className="brand-lockup">
-          <span className="brand-mark">B</span>
-          <span className="brand-name">BLOCKSPHERE</span>
+          <img
+            className="brand-image"
+            src="/blocksphere-logo.png"
+            alt="Blocksphere"
+          />
         </div>
       </header>
 
@@ -417,8 +420,11 @@ function InvestigationWorkspace({
         <div className="investigation-main compact-main">
           <header className="investigation-topbar compact-topbar">
             <div className="topbar-brand">
-              <span className="brand-mark small-mark">B</span>
-              <span>BLOCKSPHERE</span>
+              <img
+                className="brand-image compact-brand-image"
+                src="/blocksphere-logo.png"
+                alt="Blocksphere"
+              />
             </div>
 
             <div className="topbar-search compact-search">

@@ -1,14 +1,18 @@
 """Private SQLite storage for wallet search history and analysis snapshots."""
 
 import json
+import logging
+import os
 import sqlite3
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 from contextlib import closing
+from typing import Any, Optional
 
 
 DEFAULT_DATABASE_PATH = Path(__file__).resolve().parent / "data" / "wallet_searches.db"
+LOGGER = logging.getLogger(__name__)
 
 
 def _utc_now() -> str:
@@ -18,10 +22,32 @@ def _utc_now() -> str:
 class WalletStore:
     """Persists every completed search without exposing database endpoints."""
 
-    def __init__(self, database_path: Path = DEFAULT_DATABASE_PATH) -> None:
-        self.database_path = Path(database_path)
-        self.database_path.parent.mkdir(parents=True, exist_ok=True)
-        self._initialize()
+    def __init__(self, database_path: Optional[Path] = None) -> None:
+        configured_path = os.getenv("WALLET_DATABASE_PATH")
+        preferred_path = Path(configured_path) if configured_path else (
+            database_path or DEFAULT_DATABASE_PATH
+        )
+        self.database_path = preferred_path
+        try:
+            self._initialize()
+        except (OSError, sqlite3.OperationalError) as exc:
+            fallback_path = self._fallback_path()
+            if fallback_path == self.database_path:
+                raise
+            LOGGER.warning(
+                "Wallet database path %s is not writable; using %s: %s",
+                self.database_path,
+                fallback_path,
+                exc,
+            )
+            self.database_path = fallback_path
+            self._initialize()
+
+    @staticmethod
+    def _fallback_path() -> Path:
+        app_data = os.getenv("LOCALAPPDATA") or os.getenv("XDG_DATA_HOME")
+        root = Path(app_data) if app_data else Path(tempfile.gettempdir())
+        return root / "blocksphere" / "wallet_searches.db"
 
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.database_path, timeout=10)
@@ -29,6 +55,7 @@ class WalletStore:
         return connection
 
     def _initialize(self) -> None:
+        self.database_path.parent.mkdir(parents=True, exist_ok=True)
         with closing(self._connect()) as connection:
             with connection:
                 connection.executescript(
@@ -73,6 +100,50 @@ class WalletStore:
         analysis_json = json.dumps(analysis, separators=(",", ":"))
         summary = analysis.get("summary", {})
 
+        try:
+            self._record_search(
+                wallet_address,
+                blockchain,
+                max_transactions,
+                analysis_json,
+                summary,
+                cache_hit,
+                now,
+            )
+        except sqlite3.OperationalError as exc:
+            if "readonly" not in str(exc).lower() and "permission" not in str(exc).lower():
+                raise
+            fallback_path = self._fallback_path()
+            if fallback_path == self.database_path:
+                raise
+            LOGGER.warning(
+                "Wallet database became unavailable at %s; switching to %s: %s",
+                self.database_path,
+                fallback_path,
+                exc,
+            )
+            self.database_path = fallback_path
+            self._initialize()
+            self._record_search(
+                wallet_address,
+                blockchain,
+                max_transactions,
+                analysis_json,
+                summary,
+                cache_hit,
+                now,
+            )
+
+    def _record_search(
+        self,
+        wallet_address: str,
+        blockchain: str,
+        max_transactions: int,
+        analysis_json: str,
+        summary: dict[str, Any],
+        cache_hit: bool,
+        now: str,
+    ) -> None:
         with closing(self._connect()) as connection:
             with connection:
                 connection.execute(
