@@ -1,13 +1,32 @@
+import os
+import re
+
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from models import WalletAnalysisRequest
 
-from investigation.service import (
-    analyze_wallet
-)
+from investigation.service import analyze_wallet
 from rule_application import router as rule_application_router
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+from wallet_cache import WalletAnalysisCache
+from wallet_store import WalletStore
+
+
+ETHEREUM_ADDRESS = re.compile(r"^0x[a-fA-F0-9]{40}$")
+
+
+def _positive_int_setting(name: str, default: int) -> int:
+    value = int(os.getenv(name, default))
+    if value < 1:
+        raise ValueError(f"{name} must be at least 1")
+    return value
+
+
+analysis_cache = WalletAnalysisCache(
+    max_entries=_positive_int_setting("WALLET_CACHE_MAX_ENTRIES", 128),
+    ttl_seconds=_positive_int_setting("WALLET_CACHE_TTL_SECONDS", 300),
+)
+wallet_store = WalletStore()
 
 
 app = FastAPI(
@@ -69,6 +88,12 @@ def analyze(
             detail="Wallet address cannot be empty"
         )
 
+    if not ETHEREUM_ADDRESS.fullmatch(wallet):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid Ethereum wallet address"
+        )
+
     if blockchain != "ethereum":
 
         raise HTTPException(
@@ -92,11 +117,27 @@ def analyze(
             )
         )
 
-    try:
+    cache_key = f"{wallet.lower()}:{request.max_transactions}"
+    cached_result = analysis_cache.get(cache_key)
 
-        result = analyze_wallet(
-            wallet,
-            request.max_transactions
+    try:
+        if cached_result is not None:
+            result = cached_result
+            cache_hit = True
+        else:
+            result = analyze_wallet(
+                wallet,
+                request.max_transactions
+            )
+            analysis_cache.set(cache_key, result)
+            cache_hit = False
+
+        wallet_store.record_search(
+            wallet_address=wallet.lower(),
+            blockchain=blockchain,
+            max_transactions=request.max_transactions,
+            analysis=result,
+            cache_hit=cache_hit,
         )
 
         return {
